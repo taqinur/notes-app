@@ -1,15 +1,37 @@
 <script setup>
-import { ref } from "vue";
+  import { ref } from "vue";
 
-const showModal = ref(false);
+  const showModal = ref(false);
+  const newNote = ref("");
+  const notes = ref([]);
+  const errorMessage = ref("");
+  function getRandomColor() {
+    return "hsl(" + Math.random() * 360 + ", 50%, 20%)";
+  }
+
+  const addNote = () =>{
+    if(newNote.value.length <10){
+      return errorMessage.value = "You must enter 10 characters"
+    }
+    notes.value.push({
+      key: newNote,
+      text: newNote.value,
+      date: new Date(),
+      backgroundColor: getRandomColor(),
+    });
+    showModal.value = false;
+    newNote.value = "";
+    errorMessage.value = "";
+  }
 </script>
 
 <template>
   <main>
     <div v-if="showModal" class="overlay">
       <div class="modal">
-        <textarea name="note" id="note" cols="30" rows="10"></textarea>
-        <button>Confirm</button>
+        <textarea v-model.trim="newNote" name="note" id="note" cols="30" rows="10"></textarea>
+        <p v-if="errorMessage"> {{ errorMessage }}</p>
+        <button @click="addNote">Confirm</button>
         <button class="close" @click="showModal = false">Close</button>
       </div>
     </div>
@@ -19,12 +41,11 @@ const showModal = ref(false);
         <button @click="showModal = true">Add new</button>
       </header>
       <div class="cards-container">
-        <div class="card">
+        <div v-for="note in notes" :key="note" class="card" :style="{backgroundColor: note. backgroundColor}">
           <p class="main-text">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi,
-            blanditiis deserunt minima dolorum ad culpa nisi corrupti.
+            {{ note.text }}
           </p>
-          <p class="date">30/1/2023</p>
+          <p class="date">Date: {{ note.date.toLocaleDateString("en-UK")}}</p>
         </div>
       </div>
     </div>
@@ -109,6 +130,9 @@ header button {
   cursor: pointer;
   border-radius: 4px;
   margin-top: 10px;
+}
+.modal p{
+  color: rgb(163, 20, 20);
 }
 .modal .close {
   background-color: rgb(163, 20, 20);
